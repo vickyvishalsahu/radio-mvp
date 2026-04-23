@@ -13,11 +13,15 @@ export const middleware = (request: NextRequest) => {
   const { pathname } = request.nextUrl;
 
   if (pathname === "/radio" && !token) {
-    return NextResponse.redirect(new URL("/", request.url));
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
   }
 
   if (pathname === "/" && token) {
-    return NextResponse.redirect(new URL("/radio", request.url));
+    const url = request.nextUrl.clone();
+    url.pathname = "/radio";
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

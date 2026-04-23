@@ -11,18 +11,20 @@ export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
   const storedState = cookieStore.get("spotify_auth_state")?.value;
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL!;
+
   if (error) {
-    return NextResponse.redirect(new URL(`/?error=${encodeURIComponent(error)}`, request.url));
+    return NextResponse.redirect(new URL(`/?error=${encodeURIComponent(error)}`, appUrl));
   }
 
   if (!code || !state || state !== storedState) {
-    return NextResponse.redirect(new URL("/?error=state_mismatch", request.url));
+    return NextResponse.redirect(new URL("/?error=state_mismatch", appUrl));
   }
 
   try {
     const tokens = await exchangeCodeForTokens(code);
 
-    const response = NextResponse.redirect(new URL("/radio", request.url));
+    const response = NextResponse.redirect(new URL("/radio", appUrl));
 
     response.cookies.delete("spotify_auth_state");
 
@@ -43,6 +45,6 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch {
-    return NextResponse.redirect(new URL("/?error=token_exchange", request.url));
+    return NextResponse.redirect(new URL("/?error=token_exchange", appUrl));
   }
 }
