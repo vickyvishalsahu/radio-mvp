@@ -50,6 +50,15 @@ export default function Player({
 
   return (
     <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-surface">
+      <a
+        href="/api/auth/signout"
+        className="absolute left-4 top-4 text-white/40 transition-colors hover:text-white/90"
+        aria-label="Sign out"
+      >
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+        </svg>
+      </a>
       <div
         className="pointer-events-none absolute inset-0 transition-colors duration-[3000ms] ease-in-out"
         style={{
