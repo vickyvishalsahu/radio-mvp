@@ -97,6 +97,7 @@ SPOTIFY_CLIENT_SECRET=<same as above>
 SPOTIFY_REDIRECT_URI=http://localhost:3001/auth/spotify/callback
 JWT_SECRET=<any long random string — run: openssl rand -hex 32>
 PORT=3001
+ANTHROPIC_API_KEY=<Claude API key — get one at console.anthropic.com>
 ```
 
 Copy the examples to get started:
@@ -279,14 +280,10 @@ Second call to `/pool/build` returns from Redis cache — watch the backend logs
 |---|---|---|
 | 1 | Fastify scaffold, Spotify OAuth, JWT auth, Prisma schema | ✅ Done |
 | 2 | Context vector builder — time, location, weather, movement | ✅ Done |
-| 3 | Taste profile + candidate pool builder | ✅ Done |
+| 3 | Taste profile · `MusicCatalog` (Spotify search) · `MusicIntelligence` (Claude Haiku) · candidate pool | ✅ Done |
 | 4 | `/next-track` hot path — scoring engine, session state | ✅ Done |
-| 5 | BullMQ workers — feedback loop, pool refresh, profile sync | ⏳ Not started |
+| 5 | BullMQ workers — feedback loop, background pool refresh, profile sync | ⏳ Not started |
 | 6 | Hardening — rate limiting, error handling, structured logging | ⏳ Not started |
-
-### Known limitations
-
-Spotify deprecated the `/audio-features` endpoint for all apps created after November 2024. The pool builder and scoring engine currently depend on it. The fix (genre-based feature inference + synthetic features from recommendation targets) is the next planned work — tracked in [DECISIONS.md](./DECISIONS.md#adr-007).
 
 ---
 
