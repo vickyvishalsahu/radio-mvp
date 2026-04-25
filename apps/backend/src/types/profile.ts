@@ -41,4 +41,5 @@ export type CandidateTrack = {
   popularity: number
   isInLibrary: boolean
   source: 'library' | 'recommendation' | 'trending'
+  hasRealFeatures?: boolean
 }
