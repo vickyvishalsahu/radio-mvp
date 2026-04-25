@@ -2,6 +2,8 @@
 
 The Fastify API for Radio. Handles context analysis, track scoring, session state, and background learning.
 
+Track selection uses a two-layer intelligence system: `MusicIntelligence` (Claude Haiku) generates artist/title candidates from context and user taste, and `MusicCatalog` (Spotify) resolves them to playable tracks.
+
 > See the [root README](../../README.md) for full setup, the API debugging guide, and architecture rationale.
 
 ---
@@ -161,6 +163,13 @@ src/
 │   ├── pool.ts                 # POST /pool/build
 │   ├── nextTrack.ts            # POST /next-track — hot path
 │   └── dev.ts                  # GET /dev/token (dev only)
+├── catalog/
+│   ├── types.ts                # MusicCatalog interface + PlayableTrack type
+│   └── spotify.ts              # SpotifyMusicCatalog — search + saved tracks
+├── intelligence/
+│   ├── types.ts                # MusicIntelligence interface + TrackIdentity type
+│   ├── promptBuilder.ts        # ContextVector → human-readable prompt (numbers → words)
+│   └── llm.ts                  # Claude Haiku implementation — recommend(context, profile) → TrackIdentity[]
 ├── services/
 │   ├── spotifyClient.ts        # All Spotify API calls — single source of truth
 │   ├── contextService.ts       # Builds ContextVector from raw device signals
