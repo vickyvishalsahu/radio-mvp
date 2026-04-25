@@ -34,7 +34,9 @@ export type CandidateTrack = {
   artistName: string
   albumId: string
   albumName: string
+  albumArtUrl: string
   durationMs: number
+  previewUrl: string | null
   features: TrackFeatures
   popularity: number
   isInLibrary: boolean
