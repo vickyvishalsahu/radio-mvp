@@ -5,6 +5,7 @@ import { getCandidatePool } from '../services/poolService.js'
 import { getTasteProfile } from '../services/profileService.js'
 import { scoreAndPick } from '../services/scoringEngine.js'
 import { checkContinuity } from '../services/continuityService.js'
+import { spotifyClient } from '../services/spotifyClient.js'
 import type { RawContext } from '../types/context.js'
 import type { SessionState, RecentTrackEntry } from '../types/session.js'
 
@@ -72,11 +73,11 @@ export default async (fastify: FastifyInstance, { prisma }: { prisma: PrismaClie
       // 3. Build context vector + load pool and profile in parallel
       const [cv, profile] = await Promise.all([
         buildContextVector(context, userId, redis),
-        getTasteProfile(userId, prisma, redis),
+        getTasteProfile(userId, prisma, redis, spotifyClient),
       ])
 
       // 4. Load candidate pool (pipeline pool read alongside other work above if possible)
-      const pool = await getCandidatePool(userId, cv, prisma, redis)
+      const pool = await getCandidatePool(userId, cv, prisma, redis, spotifyClient)
 
       if (pool.length === 0) {
         return reply.code(503).send({ error: 'No candidate tracks available — try again in a moment' })
