@@ -18,8 +18,9 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  sessions   Session[]
-  playEvents PlayEvent[]
+  sessions    Session[]
+  playEvents  PlayEvent[]
+  userProfile UserProfile?
 }
 
 model Session {
@@ -45,4 +46,17 @@ model PlayEvent {
 
   user    User    @relation(fields: [userId], references: [id])
   session Session @relation(fields: [sessionId], references: [id])
+}
+
+model UserProfile {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  topArtistIds        Json
+  topGenres           Json
+  audioFeatureWeights Json
+  recentTrackIds      Json
+  radioTrackIds       Json
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 }
