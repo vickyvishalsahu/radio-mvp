@@ -8,6 +8,10 @@ const SPOTIFY_API_URL = 'https://api.spotify.com/v1'
 const FEAT_PATTERNS = ['featuring', 'feat.', 'ft.']
 const SUFFIX_PATTERNS = ['(remastered', '(deluxe edition', '(live)']
 
+type SpotifySavedTrack = {
+  track: SpotifySearchTrack
+}
+
 type SpotifySearchTrack = {
   id: string
   name: string
@@ -76,6 +80,16 @@ const bestMatch = (
 
 export const _bestMatch = bestMatch // exported for testing only
 
+const toPlayableTrack = (track: SpotifySearchTrack): PlayableTrack => ({
+  trackId:     track.id,
+  trackName:   track.name,
+  artistName:  track.artists[0]?.name ?? '',
+  albumName:   track.album.name,
+  albumArtUrl: track.album.images[0]?.url ?? '',
+  durationMs:  track.duration_ms,
+  previewUrl:  track.preview_url,
+})
+
 export const createSpotifyMusicCatalog = (userId: string, prisma: PrismaClient): MusicCatalog => ({
   async search(artist, title) {
     const token = await spotifyClient.getTokenForUser(userId, prisma)
@@ -93,14 +107,20 @@ export const createSpotifyMusicCatalog = (userId: string, prisma: PrismaClient):
     const match = bestMatch(data.tracks.items, artist, title)
     if (!match) return null
 
-    return {
-      trackId:     match.id,
-      trackName:   match.name,
-      artistName:  match.artists[0]?.name ?? '',
-      albumName:   match.album.name,
-      albumArtUrl: match.album.images[0]?.url ?? '',
-      durationMs:  match.duration_ms,
-      previewUrl:  match.preview_url,
+    return toPlayableTrack(match)
+  },
+
+  async getSavedTracks() {
+    const token = await spotifyClient.getTokenForUser(userId, prisma)
+    const url   = `${SPOTIFY_API_URL}/me/tracks?limit=50`
+
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    if (!res.ok) {
+      const text = await res.text()
+      throw new Error(`Spotify /me/tracks failed ${res.status}: ${text}`)
     }
+
+    const data = await res.json() as { items: SpotifySavedTrack[] }
+    return data.items.map(item => toPlayableTrack(item.track))
   },
 })
