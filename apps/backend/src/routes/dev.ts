@@ -3,7 +3,7 @@
 // in Postgres, and returns a backend JWT. No separate OAuth flow needed.
 import type { FastifyInstance } from 'fastify'
 import type { PrismaClient } from '@prisma/client'
-import { spotifyClient } from '../services/spotifyClient.js'
+import { spotifyAuth } from '../services/spotifyClient.js'
 import type { JwtPayload } from '../types/index.js'
 
 export default async (fastify: FastifyInstance, { prisma }: { prisma: PrismaClient }) => {
@@ -13,7 +13,7 @@ export default async (fastify: FastifyInstance, { prisma }: { prisma: PrismaClie
     const spotifyToken = request.query.spotify_token
 
     if (spotifyToken) {
-      const spotifyUser = await spotifyClient.getCurrentUser(spotifyToken)
+      const spotifyUser = await spotifyAuth.getCurrentUser(spotifyToken)
       const user = await prisma.user.upsert({
         where: { spotifyId: spotifyUser.id },
         create: {

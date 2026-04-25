@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { PrismaClient } from "@prisma/client";
-import { spotifyClient } from "../services/spotifyClient.js";
+import { spotifyAuth } from "../services/spotifyClient.js";
 import type { JwtPayload } from "../types/index.js";
 
 // In-memory state store for CSRF protection.
@@ -21,7 +21,7 @@ export default async (fastify: FastifyInstance, { prisma }: { prisma: PrismaClie
     cleanExpiredStates();
     const state = crypto.randomUUID();
     pendingStates.set(state, Date.now() + STATE_TTL_MS);
-    return reply.redirect(spotifyClient.getAuthorizationUrl(state));
+    return reply.redirect(spotifyAuth.getAuthorizationUrl(state));
   });
 
   fastify.get<{
@@ -44,8 +44,8 @@ export default async (fastify: FastifyInstance, { prisma }: { prisma: PrismaClie
       return reply.code(400).send({ error: "State expired" });
     }
 
-    const tokens = await spotifyClient.exchangeCode(code);
-    const spotifyUser = await spotifyClient.getCurrentUser(tokens.access_token);
+    const tokens = await spotifyAuth.exchangeCode(code);
+    const spotifyUser = await spotifyAuth.getCurrentUser(tokens.access_token);
 
     const user = await prisma.user.upsert({
       where: { spotifyId: spotifyUser.id },

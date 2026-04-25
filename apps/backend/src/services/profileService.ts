@@ -13,9 +13,8 @@ export const buildTasteProfile = async (
 ): Promise<TasteProfile> => {
   const token = await spotifyClient.getTokenForUser(userId, prisma)
 
-  const [topArtists, topTracks, recentTracks] = await Promise.all([
+  const [topArtists, recentTracks] = await Promise.all([
     spotifyClient.getTopArtists(token),
-    spotifyClient.getTopTracks(token),
     spotifyClient.getRecentlyPlayed(token),
   ])
 
