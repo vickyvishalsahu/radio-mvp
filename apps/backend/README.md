@@ -102,7 +102,7 @@ pnpm prisma generate
 |---|---|---|
 | `POST` | `/context/vector` | Build a context vector from device signals |
 | `POST` | `/pool/build` | Build + cache a candidate track pool |
-| `POST` | `/next-track` | Pick the next track (Phase 4 — not yet built) |
+| `POST` | `/next-track` | Pick and return the next track |
 
 ### Dev only (not available in production)
 
@@ -136,6 +136,16 @@ Use the `token` as `Bearer <token>` in subsequent requests. Valid for 7 days.
 
 ---
 
+## Music provider
+
+The backend is designed to be music-source agnostic. Spotify is the current implementation, but the architecture anticipates a `MusicProvider` interface — any source (Apple Music, Last.fm, a local database) that implements it can be swapped in without touching the scoring engine or session logic.
+
+> See [DECISIONS.md — ADR-008](../../DECISIONS.md#adr-008) for the full rationale.
+
+**Current status**: `spotifyClient.ts` is the sole provider. The interface extraction is planned as part of the audio-features deprecation fix.
+
+---
+
 ## Key files
 
 ```
@@ -149,16 +159,20 @@ src/
 │   ├── auth.ts                 # GET /auth/spotify/login + /callback
 │   ├── context.ts              # POST /context/vector
 │   ├── pool.ts                 # POST /pool/build
+│   ├── nextTrack.ts            # POST /next-track — hot path
 │   └── dev.ts                  # GET /dev/token (dev only)
 ├── services/
 │   ├── spotifyClient.ts        # All Spotify API calls — single source of truth
 │   ├── contextService.ts       # Builds ContextVector from raw device signals
 │   ├── profileService.ts       # Fetches + caches user taste profile
-│   └── poolService.ts          # Builds + caches candidate track pool
+│   ├── poolService.ts          # Builds + caches candidate track pool
+│   ├── scoringEngine.ts        # Pure scoring function — no I/O
+│   └── continuityService.ts    # Gapless album sequencing
 ├── types/
 │   ├── index.ts                # JWT payload + Spotify API shapes
 │   ├── context.ts              # RawContext, ContextVector
-│   └── profile.ts              # TasteProfile, CandidateTrack
+│   ├── profile.ts              # TasteProfile, CandidateTrack
+│   └── session.ts              # SessionState, ContinuityHint
 └── prisma/
     └── schema.prisma           # User, Session, PlayEvent, UserProfile
 ```
@@ -172,6 +186,6 @@ src/
 | 1 | Scaffold, OAuth, JWT auth, Prisma schema | ✅ |
 | 2 | Context vector — time, weather, location, movement | ✅ |
 | 3 | Taste profile + candidate pool | ✅ |
-| 4 | `/next-track` scoring engine + session state | 🔜 |
-| 5 | BullMQ workers — feedback loop, pool refresh | 🔜 |
-| 6 | Rate limiting, structured logging, hardening | 🔜 |
+| 4 | `/next-track` scoring engine + session state | ✅ |
+| 5 | BullMQ workers — feedback loop, pool refresh | ⏳ |
+| 6 | Rate limiting, structured logging, hardening | ⏳ |

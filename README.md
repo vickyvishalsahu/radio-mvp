@@ -279,9 +279,13 @@ Second call to `/pool/build` returns from Redis cache — watch the backend logs
 | 1 | Fastify scaffold, Spotify OAuth, JWT auth, Prisma schema | ✅ Done |
 | 2 | Context vector builder — time, location, weather, movement | ✅ Done |
 | 3 | Taste profile + candidate pool builder | ✅ Done |
-| 4 | `/next-track` hot path — scoring engine, session state | 🔜 Next |
-| 5 | BullMQ workers — feedback loop, pool refresh, profile sync | 🔜 |
-| 6 | Hardening — rate limiting, error handling, structured logging | 🔜 |
+| 4 | `/next-track` hot path — scoring engine, session state | ✅ Done |
+| 5 | BullMQ workers — feedback loop, pool refresh, profile sync | ⏳ Not started |
+| 6 | Hardening — rate limiting, error handling, structured logging | ⏳ Not started |
+
+### Known limitations
+
+Spotify deprecated the `/audio-features` endpoint for all apps created after November 2024. The pool builder and scoring engine currently depend on it. The fix (genre-based feature inference + synthetic features from recommendation targets) is the next planned work — tracked in [DECISIONS.md](./DECISIONS.md#adr-007).
 
 ---
 
