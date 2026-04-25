@@ -4,8 +4,10 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import { PrismaClient } from "@prisma/client";
 import authPlugin from "./plugins/auth.js";
+import redisPlugin from "./plugins/redis.js";
 import healthRoute from "./routes/health.js";
 import authRoutes from "./routes/auth.js";
+import contextRoutes from "./routes/context.js";
 
 const prisma = new PrismaClient();
 
@@ -15,9 +17,11 @@ const start = async () => {
   await fastify.register(cors, { origin: true });
   await fastify.register(helmet);
   await fastify.register(authPlugin);
+  await fastify.register(redisPlugin);
 
   await fastify.register(healthRoute);
   await fastify.register(authRoutes, { prisma });
+  await fastify.register(contextRoutes);
 
   const port = Number(process.env.PORT ?? 3001);
 
