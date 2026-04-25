@@ -159,7 +159,7 @@ The recommendation endpoint (`/recommendations`) already applies feature targeti
 **Title**: Music-provider abstraction — MusicProvider interface
 
 **Date**: April 2025  
-**Status**: Planned (implementation follows ADR-007 fix)
+**Status**: Active
 
 **Decision**: Extract a `MusicProvider` interface that `poolService`, `profileService`, and `continuityService` depend on. `spotifyClient.ts` becomes the first implementation. Future providers (Apple Music, Last.fm, local DB) implement the same interface.
 
@@ -171,7 +171,7 @@ The interface boundary also clarifies what the scoring engine needs: `CandidateT
 - Keep calling spotifyClient directly and refactor later: accumulates debt, makes provider swap harder
 - Build the abstraction before fixing the 403: correct order is fix first (unblock development), abstract second
 
-**Consequences**: One extra file (`types/musicProvider.ts`). Services accept a `MusicProvider` parameter instead of importing `spotifyClient` at the top. Routes wire up the provider on startup. Negligible runtime cost.
+**Consequences**: Spotify is wired as `MusicCatalog` (`catalog/spotify.ts`). `MusicIntelligence` is wired as Claude Haiku (`intelligence/llm.ts`) — see ADR-012. Routes create both per request and pass them into the service layer. Adding a second provider means implementing the interface and swapping the wiring in the route — nothing else changes.
 
 ---
 
