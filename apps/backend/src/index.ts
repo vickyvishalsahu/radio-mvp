@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.js";
 import contextRoutes from "./routes/context.js";
 import poolRoutes from "./routes/pool.js";
 import devRoutes from "./routes/dev.js";
+import nextTrackRoute from "./routes/nextTrack.js";
 
 const prisma = new PrismaClient();
 
@@ -26,6 +27,7 @@ const start = async () => {
   await fastify.register(contextRoutes);
   await fastify.register(poolRoutes, { prisma });
   await fastify.register(devRoutes, { prisma });
+  await fastify.register(nextTrackRoute, { prisma });
 
   const port = Number(process.env.PORT ?? 3001);
 
