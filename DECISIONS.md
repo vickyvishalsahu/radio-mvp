@@ -212,3 +212,20 @@ Removing skip also simplifies the backend significantly — no queue state to ma
 - Show the next track in advance: creates anticipation anxiety — "that's not what I want right now"
 
 **Consequences**: The algorithm must be good enough that users don't want to skip. This raises the bar on context accuracy and scoring quality. If the algorithm feels wrong, the whole product feels wrong — there is no escape valve.
+
+---
+
+## ADR-011 — MusicCatalog + MusicIntelligence split
+
+Date: April 2025
+Status: Active
+
+Decision: Split MusicProvider into MusicCatalog (platform search + playback) and MusicIntelligence (what to play next).
+
+Why: Every streaming platform will deprecate recommendation APIs eventually. Search APIs are stable — they are how users find music. By owning the intelligence layer and using platforms only for search, we have a durable architecture with no dependency on any platform's recommendation engine.
+
+Alternatives considered:
+- Keep MusicProvider as one interface: conflates two concerns with different change rates
+- Build our own catalog: too expensive for MVP
+
+Consequences: MusicIntelligence needs an implementation. First candidate: Last.fm tags API or LLM — decision deferred to Dolores.
